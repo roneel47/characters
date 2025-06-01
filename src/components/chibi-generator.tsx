@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -13,15 +14,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ChibiCardDisplay } from './chibi-card-display';
-import { Loader2 } from 'lucide-react';
+import { Loader2, FileDown } from 'lucide-react';
 
-const themes = ["Pirate", "Ninja", "Ice Cream", "Robot", "Unicorn", "Wizard", "Cat", "Astronaut", "Superhero", "Dragon", "Fairy"];
+const themes = ["Pirate", "Ninja", "Ice Cream", "Robot", "Unicorn", "Wizard", "Cat", "Astronaut", "Superhero", "Dragon", "Fairy", "Alien", "Zombie", "Vampire", "Ghost"];
+const rarities = ["Common", "Rare", "Epic", "Legendary", "Shiny"];
 
 const formSchema = z.object({
   theme: z.string().min(1, "Theme is required."),
+  rarity: z.string().min(1, "Rarity is required."),
   additionalDescription: z.string().optional(),
-  attack: z.coerce.number().min(0, "Attack must be positive.").max(100, "Attack cannot exceed 100."),
-  defense: z.coerce.number().min(0, "Defense must be positive.").max(100, "Defense cannot exceed 100."),
+  attack: z.coerce.number().min(0, "Attack must be at least 0.").max(100, "Attack cannot exceed 100."),
+  defense: z.coerce.number().min(0, "Defense must be at least 0.").max(100, "Defense cannot exceed 100."),
 });
 
 type ChibiFormValues = z.infer<typeof formSchema>;
@@ -35,6 +38,7 @@ export function ChibiGenerator() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       theme: themes[0],
+      rarity: rarities[0],
       additionalDescription: "",
       attack: 10,
       defense: 10,
@@ -43,7 +47,7 @@ export function ChibiGenerator() {
 
   const onSubmit: SubmitHandler<ChibiFormValues> = async (data) => {
     setIsLoading(true);
-    setCardImageUri(null); // Clear previous card
+    setCardImageUri(null);
 
     const descriptionForAI = `A ${data.theme.toLowerCase()} themed chibi character. ${data.additionalDescription || ''}`.trim();
     
@@ -51,6 +55,7 @@ export function ChibiGenerator() {
       description: descriptionForAI,
       attack: data.attack,
       defense: data.defense,
+      rarity: data.rarity,
     };
 
     try {
@@ -76,6 +81,25 @@ export function ChibiGenerator() {
     }
   };
 
+  const handleDownload = () => {
+    if (cardImageUri) {
+      const link = document.createElement('a');
+      link.href = cardImageUri;
+      const theme = form.getValues("theme") || "Chibi";
+      const rarity = form.getValues("rarity") || "Card";
+      const attack = form.getValues("attack");
+      const defense = form.getValues("defense");
+      link.download = `ChibiCard-${theme.replace(/\s+/g, '_')}-${rarity.replace(/\s+/g, '_')}-A${attack}-D${defense}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({
+        title: "Download Started",
+        description: "Your Chibi card is being downloaded.",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="grid md:grid-cols-2 gap-8 items-start">
@@ -83,7 +107,7 @@ export function ChibiGenerator() {
           <CardHeader>
             <CardTitle className="text-3xl font-headline text-center">Create Your Chibi Card</CardTitle>
             <CardDescription className="text-center">
-              Select a theme, add details, and set attributes for your card!
+              Select a theme, rarity, add details, and set attributes for your card!
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -105,6 +129,30 @@ export function ChibiGenerator() {
                           {themes.map((theme) => (
                             <SelectItem key={theme} value={theme}>
                               {theme}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="rarity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rarity</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select card rarity" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {rarities.map((rarity) => (
+                            <SelectItem key={rarity} value={rarity}>
+                              {rarity}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -157,7 +205,7 @@ export function ChibiGenerator() {
                     )}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -170,6 +218,14 @@ export function ChibiGenerator() {
               </form>
             </Form>
           </CardContent>
+          {cardImageUri && (
+            <CardFooter className="flex justify-center pt-4">
+              <Button variant="outline" onClick={handleDownload} disabled={!cardImageUri || isLoading}>
+                <FileDown className="mr-2 h-4 w-4" />
+                Download Card
+              </Button>
+            </CardFooter>
+          )}
         </Card>
         
         <div className="sticky top-8">
