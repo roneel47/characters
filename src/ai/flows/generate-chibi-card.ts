@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Generates a Chibi Battle Card image based on a textual description, attack, defense, size, height, and rarity.
+ * @fileOverview Generates a Chibi Battle Card image based on a textual description, attack, defense, height, and rarity.
  *
  * - generateChibiCard - A function that handles the card generation process.
  * - GenerateChibiCardInput - The input type for the generateChibiCard function.
@@ -15,7 +15,6 @@ const GenerateChibiCardInputSchema = z.object({
   description: z.string().describe('The description of the Chibi Battle Card character and theme.'),
   attack: z.number().describe('The attack value for the card.'),
   defense: z.number().describe('The defense value for the card.'),
-  size: z.string().describe('The size category of the character (e.g., Tiny, Small, Medium, Large, Giant).'),
   height: z.string().describe('The specific height of the character (e.g., "5cm", "2 inches", "Tall").'),
   rarity: z.string().describe('The rarity of the card (e.g., Common, Rare, Epic, Legendary, Shiny), which influences the background and border.'),
 });
@@ -41,31 +40,32 @@ const generateChibiCardFlow = ai.defineFlow(
     outputSchema: GenerateChibiCardOutputSchema,
   },
   async (input: GenerateChibiCardInput) => {
-    const imagePromptText = `Create a visually distinct Chibi Battle Card with SHARP RECTANGULAR EDGES (NO ROUNDED CORNERS).
-The card design should be dynamic and engaging, inspired by collectible trading cards (like Slam Attax or Pokemon cards), featuring clear sections for character art and stats. It should not look plain.
+    const imagePromptText = `Create a Chibi Battle Card with a MINIMAL and CLEAN design, inspired by the provided visual example. The overall card should have SLIGHTLY ROUNDED CORNERS.
 
-Theme based on: "${input.description}".
-Character: A cute, Chibi or bean-shaped character (like Fall Guys/Stumble Guys), colorful, non-violent, wearing a fun costume matching the theme. Playful pose.
+Character Description: "${input.description}".
+Character Art Style: Cute, Chibi-style character (like Fall Guys/Stumble Guys or the example image), colorful, non-violent, wearing a fun costume matching the theme. Playful pose. The character should be the main focus and take up a significant portion of the upper card area.
 
-Rarity: "${input.rarity}". This is crucial and MUST dictate the card's background, border, and overall feel:
-- Common: Simple, clean, or muted background. Minimal extra effects. Standard border.
-- Rare: Cool blue-themed background and border accents. May include subtle patterns, light water or air-like effects.
-- Epic: Impressive purple-themed background and border accents. Could feature magical glows, swirling energy, or arcane symbols.
-- Legendary: Majestic golden or bright yellow-themed background and border accents. Should feel powerful and prestigious, possibly with ornate details, sunbeam effects, or a regal aura.
-- Shiny: Vibrant, sparkling, holographic-style background that covers most of the card, with prominent stars, glitter, and rainbow refractions. The character itself might also have a slight shimmer. The border should also be holographic or shimmering.
+Card Layout:
+1.  Character Art Area:
+    *   The character art should be contained within a SHARP RECTANGULAR frame.
+    *   Background (within character art area): Simple, thematic, subtly influenced by rarity.
+    *   Border (around character art area): Clean, thin line.
+2.  Bottom Section: A distinct rectangular area below the character art, for name and attributes.
+    *   Character Name: Displayed prominently in this section, using a clear, legible, slightly playful font. (You can invent a fitting name based on the theme and character).
+    *   Attributes: Clearly display Attack, Defense, and Height in this bottom section.
+        *   For each attribute (Attack: "${input.attack}", Defense: "${input.defense}", Height: "${input.height}"):
+            *   The numeric VALUE (e.g., "${input.attack}") should be inside a small, solid-colored rectangular box. The color of this box can be thematic or a standard accent color.
+            *   The attribute LABEL (e.g., "ATTACK") should be written clearly underneath its respective value box.
 
-Card Elements (all clearly visible, legible, and integrated into the design):
-1. Card Name: Displayed prominently at the top in a bubbly, rounded, thematic font. (You can invent a fitting name based on the theme and character).
-2. Character Art: The Chibi character should be the main focus.
-3. Attributes Section: Clearly display the following attributes, possibly in designated stat boxes or areas with clear labels (e.g., "ATK: ${input.attack}", "DEF: ${input.defense}", "SIZE: ${input.size}", "HGT: ${input.height}"):
-    - Attack: "${input.attack}"
-    - Defense: "${input.defense}"
-    - Size: "${input.size}"
-    - Height: "${input.height}"
-4. Border: A sharp rectangular border around the card frame, complementing the rarity (e.g., simple for common, metallic for rare/epic, ornate for legendary, holographic for shiny). NO rounded corners on the card itself.
+Rarity Influence ("${input.rarity}"): This is crucial and MUST subtly dictate the card's background (within the character art area) and accent colors/thin outer border of the overall card.
+- Common: Simple, clean background. Standard, minimal border/accents.
+- Rare: Subtle cool blue-themed hues in the background and/or border/accents.
+- Epic: Subtle impressive purple-themed hues in the background and/or border/accents.
+- Legendary: Subtle majestic golden or bright yellow-themed hues in the background and/or border/accents.
+- Shiny: Subtle vibrant, sparkling, or holographic-style hints in the background, with hints of stars or glitter. The character itself might also have a slight shimmer. The border/accents should also reflect this shininess subtly.
 
-Overall Style: Light-hearted, colorful, game-friendly for a casual digital card game. Ensure all text, especially stats, are highly legible against their backgrounds. The card should feel like a collectible item.
-The rarity's visual impact on the background and border is a primary requirement. The card must be a full rectangle.`;
+Overall Style: Light-hearted, colorful, cute, and minimal. Ensure all text (name, attributes) is highly legible. The card should feel like a collectible item from a modern, cute game. The card itself must be a full rectangle with slightly rounded outer corners, but the inner character art frame must have sharp corners. Avoid overly complex designs; prioritize clarity and cuteness.
+`;
 
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-exp',
