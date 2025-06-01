@@ -12,11 +12,10 @@ interface ChibiCardDisplayProps {
 
 export function ChibiCardDisplay({ cardDataUri, isLoading }: ChibiCardDisplayProps) {
   return (
-    <Card className="w-full max-w-md mx-auto shadow-xl bg-card/80 backdrop-blur-sm rounded-lg">
+    <Card className="w-full max-w-md mx-auto shadow-xl bg-card/80 backdrop-blur-sm">
       <CardContent className="p-4">
         <div className={cn(
-          "aspect-[2.5/3.5] w-full overflow-hidden relative group",
-          "shadow-[0_0_10px_1px_hsl(var(--primary)/0.5)]" // Simplified shadow
+          "aspect-[2.5/3.5] w-full overflow-hidden relative group shadow-md"
         )}>
           {isLoading ? (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 animate-pulse rounded-md">
@@ -31,19 +30,19 @@ export function ChibiCardDisplay({ cardDataUri, isLoading }: ChibiCardDisplayPro
               alt="Generated Chibi Battle Card"
               layout="fill"
               objectFit="contain"
-              className="transition-opacity duration-500 opacity-0 group-data-[loaded=true]:opacity-100 rounded-md" // Added rounded-md here for the image itself if desired
+              className="transition-opacity duration-500 opacity-0 group-data-[loaded=true]:opacity-100"
               priority
               data-ai-hint="battle card character"
               onLoad={(e) => e.currentTarget.parentElement?.setAttribute('data-loaded', 'true')}
             />
           ) : (
             <Image
-              src="https://placehold.co/400x560.png"
+              src="https://placehold.co/500x700.png"
               alt="Placeholder for Chibi Battle Card"
               layout="fill"
               objectFit="cover"
               data-ai-hint="card game character"
-              className="opacity-50 rounded-md" // Added rounded-md here
+              className="opacity-50"
             />
           )}
            <div className="absolute inset-0 border border-black/20 rounded-md pointer-events-none" /> 
