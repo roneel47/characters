@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { CharacterImageDisplay } from './chibi-card-display';
+import { CharacterImageDisplay } from './chibi-card-display'; // File name should ideally be character-image-display.tsx
 import { Loader2, FileDown } from 'lucide-react';
 
 const themes = ["Pirate", "Ninja", "Ice Cream", "Robot", "Unicorn", "Wizard", "Cat", "Astronaut", "Superhero", "Dragon", "Fairy", "Alien", "Zombie", "Vampire", "Ghost", "Disney Dolls"];
@@ -47,9 +47,10 @@ export function ChibiGenerator() {
 
   const onSubmit: SubmitHandler<ChibiFormValues> = async (data) => {
     setIsGenerating(true);
-    setGeneratedImages([]);
+    setGeneratedImages([]); // Clear previous images at the start of new generation
     const currentImages: GeneratedImageInfo[] = [];
 
+    // Prepare the base description
     const descriptionForAI = `A ${data.theme.toLowerCase()} themed chibi character. ${data.additionalDescription || ''}`.trim();
 
     for (const rarity of rarities) {
@@ -92,6 +93,7 @@ export function ChibiGenerator() {
     if (imageInfo.uri) {
       const link = document.createElement('a');
       link.href = imageInfo.uri;
+      // Using theme and rarity in the filename
       link.download = `ChibiCharacter-${imageInfo.theme.replace(/\s+/g, '_')}-${imageInfo.rarity.replace(/\s+/g, '_')}.png`;
       document.body.appendChild(link);
       link.click();
@@ -172,12 +174,14 @@ export function ChibiGenerator() {
         </Card>
         
         <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Show loading placeholders if generating and no images yet for those rarities */}
           {isGenerating && generatedImages.length === 0 && rarities.map(rarity => (
             <div key={rarity} className="flex flex-col items-center">
               <p className="font-semibold text-lg mb-2">{rarity}</p>
               <CharacterImageDisplay characterImageDataUri={null} isLoading={true} />
             </div>
           ))}
+          {/* Display generated images or placeholders */}
           {generatedImages.map((imageInfo, index) => (
             <div key={index} className="flex flex-col items-center space-y-2">
               <h3 className="text-xl font-semibold text-center">{imageInfo.rarity}</h3>
@@ -188,7 +192,7 @@ export function ChibiGenerator() {
                   Download {imageInfo.rarity}
                 </Button>
               )}
-              {!imageInfo.uri && !isGenerating && (
+              {!imageInfo.uri && !isGenerating && ( // Show failed to load only if not generating and URI is null
                 <p className="text-destructive text-center">Failed to load</p>
               )}
             </div>
