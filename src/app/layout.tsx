@@ -1,10 +1,11 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Chibi Clash Cards',
-  description: 'Generate cute Chibi battle cards!',
+  title: 'Chibi Character Generator',
+  description: 'Generate cute Chibi character images!',
 };
 
 export default function RootLayout({
