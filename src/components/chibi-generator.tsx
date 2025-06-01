@@ -18,6 +18,7 @@ import { Loader2, FileDown } from 'lucide-react';
 
 const themes = ["Pirate", "Ninja", "Ice Cream", "Robot", "Unicorn", "Wizard", "Cat", "Astronaut", "Superhero", "Dragon", "Fairy", "Alien", "Zombie", "Vampire", "Ghost"];
 const rarities = ["Common", "Rare", "Epic", "Legendary", "Shiny"];
+const sizes = ["Tiny", "Small", "Medium", "Large", "Giant"];
 
 const formSchema = z.object({
   theme: z.string().min(1, "Theme is required."),
@@ -25,6 +26,8 @@ const formSchema = z.object({
   additionalDescription: z.string().optional(),
   attack: z.coerce.number().min(0, "Attack must be at least 0.").max(100, "Attack cannot exceed 100."),
   defense: z.coerce.number().min(0, "Defense must be at least 0.").max(100, "Defense cannot exceed 100."),
+  size: z.string().min(1, "Size is required."),
+  height: z.string().min(1, "Height is required.").max(20, "Height seems too long (max 20 chars)."),
 });
 
 type ChibiFormValues = z.infer<typeof formSchema>;
@@ -42,6 +45,8 @@ export function ChibiGenerator() {
       additionalDescription: "",
       attack: 10,
       defense: 10,
+      size: sizes[2], // Default to Medium
+      height: "5cm", 
     },
   });
 
@@ -55,6 +60,8 @@ export function ChibiGenerator() {
       description: descriptionForAI,
       attack: data.attack,
       defense: data.defense,
+      size: data.size,
+      height: data.height,
       rarity: data.rarity,
     };
 
@@ -199,6 +206,45 @@ export function ChibiGenerator() {
                         <FormLabel>Defense</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Size</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select character size" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {sizes.map((size) => (
+                              <SelectItem key={size} value={size}>
+                                {size}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="height"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Height</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder='e.g., "5cm" or "Tall"' {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -14,7 +15,7 @@ export function ChibiCardDisplay({ cardDataUri, isLoading }: ChibiCardDisplayPro
     <Card className="w-full max-w-md mx-auto shadow-xl bg-card/80 backdrop-blur-sm">
       <CardContent className="p-4">
         <div className={cn(
-          "aspect-[2.5/3.5] w-full rounded-lg overflow-hidden relative group",
+          "aspect-[2.5/3.5] w-full overflow-hidden relative group", // Removed rounded-lg
           "shadow-[0_0_15px_2px_hsl(var(--primary)/0.7)] hover:shadow-[0_0_25px_5px_hsl(var(--primary)/0.9)] transition-shadow duration-300"
         )}>
           {isLoading ? (
@@ -45,7 +46,7 @@ export function ChibiCardDisplay({ cardDataUri, isLoading }: ChibiCardDisplayPro
               className="opacity-50"
             />
           )}
-           <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 animate-glow opacity-75 group-hover:opacity-100" />
+           <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 animate-glow opacity-75 group-hover:opacity-100" /> {/* Removed rounded-lg */}
         </div>
       </CardContent>
     </Card>
